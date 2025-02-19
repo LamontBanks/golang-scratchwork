@@ -1,20 +1,23 @@
 // Use channels to run concurrent jobs and colelct results
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
 	jobs := make(chan int)
 	results := make(chan int)
 
 	// Starter worker pool
-	numWorkers := 3
+	numWorkers := 10
 	for i := 0; i < numWorkers; i++ {
 		go worker(jobs, results)
 	}
 
 	// Create "jobs"
-	numJobs := 20
+	numJobs := 100
 	go func() {
 		for numToSquare := 0; numToSquare < numJobs; numToSquare++ {
 			jobs <- numToSquare
@@ -38,6 +41,10 @@ func worker(jobs <-chan int, results chan<- int) {
 	for num := range jobs {
 		// Dummy job: Compute squares of numbers
 		result := num * num
+
+		// Fake job time
+		time.Sleep(250 * time.Millisecond)
+
 		results <- result
 	}
 }
