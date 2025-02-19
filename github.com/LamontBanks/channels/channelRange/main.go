@@ -7,15 +7,7 @@ func main() {
 	ch := make(chan int)
 
 	// Function to send down channel
-	// go sendInt(ch, numSends)
-
-	// Anonymous function to send down channel
-	go func() {
-		for i := 0; i < numSends; i++ {
-			ch <- i
-		}
-		close(ch) // Range over channel requires channel to be manually closed
-	}()
+	go sendInt(ch, numSends)
 
 	receivedNum := []int{}
 	for receivedInt := range ch {
@@ -30,5 +22,5 @@ func sendInt(ch chan<- int, numSends int) {
 		ch <- i
 	}
 
-	// close(ch)
+	close(ch)
 }
