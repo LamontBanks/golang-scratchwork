@@ -19,6 +19,10 @@ func main() {
 	}
 
 	fmt.Println(root.inOrderPrint())
+	randMin := rand.Intn(100)
+	randMax := rand.Intn(100)
+
+	fmt.Printf("Values between %v and %v:\n%v", randMin, randMax, root.getRange(randMin, randMax))
 }
 
 // ---
@@ -68,4 +72,27 @@ func (node TreeNode) inOrderPrint() string {
 	}
 
 	return str
+}
+
+// Get values within the min, max range
+func (node TreeNode) getRange(minVal, maxVal int) []int {
+	var values []int
+
+	if node.val >= minVal {
+		if node.left != nil {
+			values = append(values, node.left.getRange(minVal, maxVal)...)
+		}
+	}
+
+	if node.val >= minVal && node.val <= maxVal {
+		values = append(values, node.val)
+	}
+
+	if node.val <= maxVal {
+		if node.right != nil {
+			values = append(values, node.right.getRange(minVal, maxVal)...)
+		}
+	}
+
+	return values
 }
