@@ -20,7 +20,7 @@ func main() {
 
 	fmt.Println(root.inOrderPrint())
 	randMin := rand.Intn(100)
-	randMax := rand.Intn(100)
+	randMax := rand.Intn(100) + randMin
 
 	fmt.Printf("Values between %v and %v:\n%v", randMin, randMax, root.getRange(randMin, randMax))
 }
