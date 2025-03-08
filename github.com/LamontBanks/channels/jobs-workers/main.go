@@ -1,50 +1,51 @@
 // Use channels to run concurrent jobs and colelct results
 package main
 
-import (
-	"fmt"
-	"time"
-)
+import "fmt"
 
 func main() {
 	jobs := make(chan int)
 	results := make(chan int)
+	final_results := make(chan int)
+
+	numWorkers := 100
+	numJobs := 100
+	numApprovers := 100
 
 	// Starter worker pool
-	numWorkers := 10
 	for i := 0; i < numWorkers; i++ {
 		go worker(jobs, results)
 	}
 
-	// Create "jobs"
-	numJobs := 100
-	go func() {
-		for numToSquare := 0; numToSquare < numJobs; numToSquare++ {
-			jobs <- numToSquare
-		}
-
-		// Notify workers that there are no more jobs
-		close(jobs)
-	}()
-
-	// Get results (in any order)
-	jobResults := make([]int, numJobs)
-	for i := 0; i < numJobs; i++ {
-		jobResults[i] = <-results
+	// Create approvers
+	for i := 0; i < numApprovers; i++ {
+		go approver(results, final_results)
 	}
 
-	// Print results
-	fmt.Println("Results: ", jobResults)
+	// Create jobs
+	// jobs -> results -> final_results
+	go func() {
+		for j := 0; j < numJobs; j++ {
+			jobs <- j
+		}
+	}()
+
+	// Print final results
+	for r := 0; r < numJobs; r++ {
+		fmt.Println(<-final_results)
+	}
 }
 
 func worker(jobs <-chan int, results chan<- int) {
 	for num := range jobs {
 		// Dummy job: Compute squares of numbers
 		result := num * num
-
-		// Fake job time
-		time.Sleep(250 * time.Millisecond)
-
 		results <- result
+	}
+}
+
+func approver(results <-chan int, final_resuls chan<- int) {
+	for result := range results {
+		final_resuls <- result / 2
 	}
 }
